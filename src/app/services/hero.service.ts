@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class HeroService {
-  private heroUrl = "http://localhost:55843/api/hero";
+  private heroUrl = "http://localhost:58860/api/hero";
   private url;
 
   constructor(private http: HttpClient, 
@@ -26,6 +26,9 @@ export class HeroService {
 
   getHero(id: number): Observable<Hero> {
     this.messageService.add(`Hero Service: fetched hero. id=${id}`);
-    return of(HEROES.find(hero=>hero.id===id));
+
+    this.url = this.heroUrl + "/GetHero/" + id;
+    //return of(HEROES.find(hero=>hero.id===id));
+    return this.http.get<Hero>(this.url);
   }
 }
