@@ -15,7 +15,7 @@ const httpOptions = {
 })
 export class HeroService {
   private heroUrl = 'http://localhost:58860/api/hero';
-  private url;
+  private url : string;
 
   constructor(private http: HttpClient,
               private messageService: MessageService) { }
@@ -42,8 +42,9 @@ export class HeroService {
   }
 
   updateHero(hero: Hero): Observable<any> {
-    this.url = this.url = `${this.heroUrl}/GetHero/${hero.id}/${hero.name}`;
-    return this.http.put(this.url, hero, httpOptions)
+    //this.url = `${this.heroUrl}/UpdateHero/${hero.id}/${hero.name}`;
+    this.url = `${this.heroUrl}/UpdateHero/${hero.id}/${hero.name}`;
+    return this.http.put(this.heroUrl, hero, httpOptions)
                     .pipe(
                       tap(_ => this.log(`updated hero. id=${hero.id}`)),
                       catchError(this.handleError<any>('updateHero'))
@@ -51,9 +52,10 @@ export class HeroService {
   }
 
   deleteHero(id: number): Observable<Hero> {
-    const url = `${this.heroUrl}/DeleteHero/${id}`;
+    this.url = `${this.heroUrl}/DeleteHero/${id}`;
+    console.log(`aaa url = ${this.url}`);
 
-    return this.http.delete<Hero>(url, httpOptions)
+    return this.http.delete(this.url, httpOptions)
                     .pipe(
                       tap(_ => this.log(`deleted hero id=${id}`)),
                       catchError(this.handleError<Hero>('deleteHero'))
