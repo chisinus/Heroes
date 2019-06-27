@@ -71,7 +71,7 @@ export class HeroService {
                     );
   }
 
-  searchHeroes(term: string): Observable<Hero[]>{
+  searchHeroes(term: string): Observable<Hero[]> {
     this.url = `${this.heroUrl}/SearchHeroes/${term}`;
     console.log(this.url);
     if (!term.trim()) { return of([]); }
