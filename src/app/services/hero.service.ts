@@ -15,7 +15,7 @@ const httpOptions = {
 })
 export class HeroService {
   private heroUrl = 'http://localhost:58860/api/hero';
-  private url : string;
+  private url: string;
 
   constructor(private http: HttpClient,
               private messageService: MessageService) { }
@@ -41,10 +41,20 @@ export class HeroService {
                     );
   }
 
+  addHero(name: string): Observable<Hero> {
+    this.url = `${this.heroUrl}/AddHero`;
+
+    return this.http.post(this.url, {name} as Hero, httpOptions)
+                    .pipe(
+                      tap(_ => this.log(`add hero ${name}`)),
+                      catchError(this.handleError<any>('addHero'))
+                    );
+  }
+
   updateHero(hero: Hero): Observable<any> {
-    //this.url = `${this.heroUrl}/UpdateHero/${hero.id}/${hero.name}`;
-    this.url = `${this.heroUrl}/UpdateHero/${hero.id}/${hero.name}`;
-    return this.http.put(this.heroUrl, hero, httpOptions)
+    this.url = `${this.heroUrl}/UpdateHero`;
+
+    return this.http.put(this.url, hero, httpOptions)
                     .pipe(
                       tap(_ => this.log(`updated hero. id=${hero.id}`)),
                       catchError(this.handleError<any>('updateHero'))
@@ -53,12 +63,23 @@ export class HeroService {
 
   deleteHero(id: number): Observable<Hero> {
     this.url = `${this.heroUrl}/DeleteHero/${id}`;
-    console.log(`aaa url = ${this.url}`);
 
-    return this.http.delete(this.url, httpOptions)
+    return this.http.delete<Hero>(this.url, httpOptions)
                     .pipe(
                       tap(_ => this.log(`deleted hero id=${id}`)),
                       catchError(this.handleError<Hero>('deleteHero'))
+                    );
+  }
+
+  searchHeroes(term: string): Observable<Hero[]>{
+    this.url = `${this.heroUrl}/SearchHeroes/${term}`;
+    console.log(this.url);
+    if (!term.trim()) { return of([]); }
+
+    return this.http.get<Hero[]>(this.url)
+                    .pipe (
+                        tap(_ => this.log(`Search: ${term}`)),
+                        catchError(this.handleError<Hero[]>('search'))
                     );
   }
 
@@ -68,13 +89,13 @@ export class HeroService {
  * @param operation - name of the operation that failed
  * @param result - optional value to return as the observable result
  */
-  private handleError<T>(operation = 'operation', result?: T){
+  private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);
       this.log(`${operation} failed. ${error.message}`);
 
       return of(result as T);
-    }
+    };
   }
 
   log(msg: string) {
